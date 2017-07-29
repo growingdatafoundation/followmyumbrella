@@ -27,7 +27,36 @@ const manifest = {
     }],
     registrations: [
         {
-            plugin: './server/api/index'
+            plugin: './server/api/index',
+            options: {
+                select: ['api'],
+                routes: {
+                    prefix: '/v1'
+                }
+            }
+        },
+        {
+            plugin: {
+            register: "good",
+            options: {
+              ops: {
+                interval: 30000
+              },
+              reporters: {
+                console: [{
+                    module: 'good-squeeze',
+                    name: 'Squeeze',
+                    args: [{
+                      log: '*',
+                      response: '*',
+                      ops: '*'
+                    }]
+                }, {
+                    module: 'good-console'
+                }, 'stdout']
+              }
+            }
+          }
         }
     ]
 };

@@ -24,8 +24,12 @@
   "dependencies": {
     "confidence": "3.x.x",
     "glue": "4.x.x",
+    "good": "^7.2.0",
+    "good-console": "^6.4.0",
+    "good-squeeze": "^5.0.2",
     "hapi": "15.x.x",
-    "hoek": "4.x.x"
+    "hoek": "4.x.x",
+    "mongodb": "^2.2.30"
   },
   "devDependencies": {
     "code": "3.x.x",
