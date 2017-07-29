@@ -1,6 +1,7 @@
 'use strict';
 
 const PointsOfInterestService = require('../data/pointsOfInterest')
+const ContributedStoriesService = require('../data/contributedStories')
 const {
   MongoClient
 } = require('mongodb');
@@ -9,9 +10,11 @@ const Joi = require('joi');
 
 exports.register = function(server, options, next) {
 
-  const mongoDbUrl = 'mongodb://localhost:27017/historic';
-  let poiService;
+  const mongoDbUrl = process.env.MONGO_DB_URL;
+  let poiService,
+    csService;
 
+  // Points of interest routes
   server.route({
     method: 'GET',
     path: '/',
@@ -43,7 +46,7 @@ exports.register = function(server, options, next) {
       }
     },
     handler: function(request, reply) {
-      reply(poiService.getPointsOfInterest(
+      reply(poiService.getNearbyPointsOfInterest(
         request.query.long,
         request.query.lat,
         request.query.radius
@@ -51,12 +54,78 @@ exports.register = function(server, options, next) {
     }
   });
 
+  server.route({
+    method: 'GET',
+    path: '/searchtags',
+    config: {
+      validate: {
+        query: Joi.object().keys({
+          tags: Joi.string().default('')
+        })
+      }
+    },
+    handler: function(request, reply) {
+      reply(poiService.getMatchingPointsOfInterest(
+        request.query.tags.split(',')
+      ));
+    }
+  });
+
+  // Contributed stories routes
+  server.route({
+    method: 'GET',
+    path: '/stories',
+    handler: function(request, reply) {
+
+      reply(csService.getContributedStories());
+    }
+  });
+
+  server.route({
+    method: 'GET',
+    path: '/stories/{id}',
+    handler: function(request, reply) {
+
+      reply(csService.getContributedStory(request.params.id));
+    }
+  });
+
+  server.route({
+    method: 'DELETE',
+    path: '/stories/{id}',
+    handler: function(request, reply) {
+
+      reply(csService.deleteContributedStory(request.params.id));
+    }
+  });
+
+  server.route({
+    method: 'PUT',
+    path: '/story',
+    config: {
+      validate: {
+        payload: Joi.object().keys({
+          title: Joi.string().required(),
+          body: Joi.string().required(),
+          author: Joi.string().default('guest@followmyumbrella.com'),
+        })
+      }
+    },
+    handler: function(request, reply) {
+      reply(csService.putContributedStory(request.payload));
+    }
+  });
+
   MongoClient.connect(mongoDbUrl)
     .then((db) => {
-			return db.collection('pointOfInterests');
+       return [
+        db.collection('pointOfInterests'),
+  			db.collection('contributedStories')
+      ];
 		})
-    .then((collect) => {
-      poiService = new PointsOfInterestService(collect);
+    .then((collections) => {
+      poiService = new PointsOfInterestService(collections[0]);
+      csService = new ContributedStoriesService(collections[1])
       next();
     })
 };
