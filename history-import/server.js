@@ -85,6 +85,7 @@ Promise.all([
         await pointOfInterests.insertMany(places);
         await pointOfInterests.insertMany(organisations);
         await pointOfInterests.insertMany(events);
+        await pointOfInterests.createIndex({"location":"2dsphere"});
 
         return db.close();
     })
