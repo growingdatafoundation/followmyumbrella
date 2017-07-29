@@ -11,6 +11,7 @@
   "dependencies": {
     "bluebird": "^3.5.0",
     "jmespath": "^0.15.0",
+    "joi": "^10.6.0",
     "mongodb": "^2.2.30",
     "node-fetch": "^1.7.1"
   }
