@@ -1,0 +1,17 @@
+{
+  "name": "history",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Simon Bruce <simon@sine.co>",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "bluebird": "^3.5.0",
+    "jmespath": "^0.15.0",
+    "mongodb": "^2.2.30",
+    "node-fetch": "^1.7.1"
+  }
+}
