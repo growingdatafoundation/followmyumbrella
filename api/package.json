@@ -1,11 +1,35 @@
 {
-  "name": "followmyumbrella-api",
-  "version": "0.0.0",
-  "description": "The API for Follow My Umbrella",
+  "name": "pi",
+  "version": "1.0.0",
+  "description": "Follow my umbrella API",
   "main": "index.js",
   "scripts": {
-    "test": "npm test"
+    "start": "nodemon server.js",
+    "test": "lab -c -L",
+    "test-cover": "lab -c -r html -o ./test/artifacts/coverage.html && open ./test/artifacts/coverage.html"
   },
-  "author": "Simon Bruce <simon@sine.co>",
-  "license": "MIT"
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "author": "Follow My Umbrella <hi@followmyumbrella.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": ""
+  },
+  "homepage": "",
+  "engines": {
+    "node": ">=4.0.0"
+  },
+  "dependencies": {
+    "confidence": "3.x.x",
+    "glue": "4.x.x",
+    "hapi": "15.x.x",
+    "hoek": "4.x.x"
+  },
+  "devDependencies": {
+    "code": "3.x.x",
+    "lab": "11.x.x",
+    "nodemon": "1.x.x"
+  }
 }
