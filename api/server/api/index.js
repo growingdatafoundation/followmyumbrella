@@ -3,56 +3,60 @@
 const PointsOfInterestService = require('../data/pointsOfInterest')
 const ContributedStoriesService = require('../data/contributedStories')
 const {
-  MongoClient
+    MongoClient
 } = require('mongodb');
 const Joi = require('joi');
 
 
+const optionsSchema = Joi.object().keys({
+    mongoDbUrl: Joi.string().required(),
+});
+
 exports.register = function(server, options, next) {
 
-  const mongoDbUrl = process.env.MONGO_DB_URL;
-  let poiService,
-    csService;
+    Joi.assert(options, optionsSchema);
 
-  // Points of interest routes
-  server.route({
-    method: 'GET',
-    path: '/',
-    handler: function(request, reply) {
+    let poiService;
+    let csService;
 
-      reply(poiService.getPointsOfInterest());
-    }
-  });
+    server.route({
+        method: 'GET',
+        path: '/',
+        handler: function(request, reply) {
 
-  server.route({
-    method: 'GET',
-    path: '/{id}',
-    handler: function(request, reply) {
+            reply(poiService.getPointsOfInterest());
+        }
+    });
 
-      reply(poiService.getPointOfInterest(request.params.id));
-    }
-  });
+    server.route({
+        method: 'GET',
+        path: '/{id}',
+        handler: function(request, reply) {
 
-  server.route({
-    method: 'GET',
-    path: '/nearest',
-    config: {
-      validate: {
-        query: Joi.object().keys({
-          long: Joi.number().required(),
-          lat: Joi.number().required(),
-          radius: Joi.number().default(1000)
-        })
-      }
-    },
-    handler: function(request, reply) {
-      reply(poiService.getNearbyPointsOfInterest(
-        request.query.long,
-        request.query.lat,
-        request.query.radius
-      ));
-    }
-  });
+            reply(poiService.getPointOfInterest(request.params.id));
+        }
+    });
+
+    server.route({
+        method: 'GET',
+        path: '/nearest',
+        config: {
+            validate: {
+                query: Joi.object().keys({
+                    long: Joi.number().required(),
+                    lat: Joi.number().required(),
+                    radius: Joi.number().default(1000)
+                })
+            }
+        },
+        handler: function(request, reply) {
+            reply(poiService.getPointsOfInterest(
+                request.query.long,
+                request.query.lat,
+                request.query.radius
+            ));
+        }
+    });
 
   server.route({
     method: 'GET',
@@ -116,20 +120,19 @@ exports.register = function(server, options, next) {
     }
   });
 
-  MongoClient.connect(mongoDbUrl)
-    .then((db) => {
-       return [
-        db.collection('pointOfInterests'),
-  			db.collection('contributedStories')
-      ];
-		})
-    .then((collections) => {
-      poiService = new PointsOfInterestService(collections[0]);
-      csService = new ContributedStoriesService(collections[1])
-      next();
-    })
+    MongoClient.connect(options.mongoDbUrl)
+        .then((db) => Promise.all([
+            db.collection('pointOfInterests'),
+		    db.collection('contributedStories')
+        ]))
+        .then(([pointOfInterestCollection, contributedStoriesCollections]) => {
+            poiService = new PointsOfInterestService(pointOfInterestCollection);
+            csService = new ContributedStoriesService(contributedStoriesCollections)
+
+            return next();
+        });
 };
 
 exports.register.attributes = {
-  name: 'api'
+    name: 'api'
 };

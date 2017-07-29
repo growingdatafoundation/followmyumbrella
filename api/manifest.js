@@ -27,36 +27,41 @@ const manifest = {
     }],
     registrations: [
         {
-            plugin: './server/api/index',
+            plugin: {
+                register: './server/api/index',
+                options: {
+                    mongoDbUrl: process.env.MONGO_DB_URL || 'mongodb://localhost:27017/historic'
+                }
+            },
             options: {
                 select: ['api'],
                 routes: {
-                    prefix: '/v1'
+                    prefix: '/api/v1/point-of-interest'
                 }
             }
         },
         {
             plugin: {
-            register: "good",
-            options: {
-              ops: {
-                interval: 30000
-              },
-              reporters: {
-                console: [{
-                    module: 'good-squeeze',
-                    name: 'Squeeze',
-                    args: [{
-                      log: '*',
-                      response: '*',
-                      ops: '*'
-                    }]
-                }, {
-                    module: 'good-console'
-                }, 'stdout']
-              }
+                register: "good",
+                options: {
+                    ops: {
+                        interval: 30000
+                    },
+                    reporters: {
+                        console: [{
+                            module: 'good-squeeze',
+                            name: 'Squeeze',
+                            args: [{
+                                log: '*',
+                                response: '*',
+                                ops: '*'
+                            }]
+                        }, {
+                            module: 'good-console'
+                        }, 'stdout']
+                    }
+                }
             }
-          }
         }
     ]
 };
