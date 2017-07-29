@@ -1,31 +1,54 @@
 'use strict';
 
 const assert = require('assert');
-const {ObjectId} = require('mongodb');
+const {
+    ObjectId
+} = require('mongodb');
 
 
 module.exports = class PointsOfInterestService {
 
-	constructor(collection) {
+    constructor(collection) {
 
-		assert(collection !== undefined, 'Collection is a required argument');
+        assert(collection !== undefined, 'Collection is a required argument');
+        this.collection = collection;
 
-		this.collection = collection;
-	}
+    }
 
-	/**
-	 * Returns all points of interest
-	 */
-	getPointsOfInterest() {
+    /**
+     * Returns all points of interest
+     */
+    getPointsOfInterest() {
 
-		return this.collection.find().toArray();
-	}
+        return this.collection.find().toArray();
+    }
 
-	/**
-	 * Returns a single point of interest
-	 */
-	getPointOfInterest(id) {
+    /**
+     * Returns a single point of interest
+     */
+    getPointOfInterest(id) {
 
-		return this.collection.findOne({ _id: ObjectId(id) });
-	}
+        return this.collection.findOne({
+            _id: ObjectId(id)
+        });
+    }
+
+    /**
+     * Returns points of interest near the location within the supplied radius
+     */
+    getPointsOfInterest(long, lat, radius) {
+        return this.collection.find({
+            location: {
+                $nearSphere: {
+                    $geometry: {
+                        type: "Point",
+                        coordinates: [long, lat]
+                    },
+                    $minDistance: 1,
+                    $maxDistance: radius
+                }
+            }
+        }).toArray();
+    }
+
 }
