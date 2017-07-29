@@ -1,0 +1,11 @@
+{
+  "name": "followmyumbrella-api",
+  "version": "0.0.0",
+  "description": "The API for Follow My Umbrella",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "author": "Simon Bruce <simon@sine.co>",
+  "license": "MIT"
+}
