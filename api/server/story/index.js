@@ -54,6 +54,7 @@ exports.register = function(server, options, next) {
                 payload: Joi.object().keys({
                 title: Joi.string().required(),
                 body: Joi.string().required(),
+                pointOfInterest: Joi.string().required(),
                 author: Joi.string().default('guest@followmyumbrella.com'),
             })
           }

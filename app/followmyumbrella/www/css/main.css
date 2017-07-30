@@ -1,0 +1,35 @@
+#login-page{
+    background-image: url('../img/bg.jpg');
+    background-size: cover;
+}
+.cwidth{
+    /*max-width: 300px;*/
+
+}
+.form-box {
+    margin-top: 200px;
+}
+.form-box imput{
+    background: none;
+}
+.logo{
+    width: 40px;
+    margin-left: 15px;
+    margin-top: 15px;
+    float: left;
+}
+.ui-listview img.ui-thumbnail.ui-thumbnail-circular, .ui-listview img.ui-thumbnail.ui-thumbnail-circular {
+    border-radius: 5px !important;
+}
+#map {
+    background: #AAA;
+    position: fixed;
+    top: 50px;
+    left: 0;
+    bottom: 50px;
+    right: 0;
+}
+.front-logo{
+    width: 200px;
+    margin: 20px;
+}
