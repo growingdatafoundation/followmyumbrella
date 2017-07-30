@@ -56,6 +56,20 @@ const manifest = {
         },
         {
             plugin: {
+                register: './server/challenge/',
+                options: {
+                    mongoDbUrl: process.env.MONGO_DB_URL || 'mongodb://localhost:27017/historic'
+                }
+            },
+            options: {
+                select: ['api'],
+                routes: {
+                    prefix: '/api/v1/challenge'
+                }
+            }
+        },
+        {
+            plugin: {
                 register: "good",
                 options: {
                     ops: {
