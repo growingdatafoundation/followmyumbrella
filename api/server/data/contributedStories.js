@@ -39,6 +39,21 @@ module.exports = class ContributedStoriesService {
     }
 
     /**
+     * Gets the contributed stories for a point of interest.
+     *
+     * @param      {Object}  arg1                    The argument 1
+     * @param      {<type>}  arg1.pointOfInterestId  The point of interest identifier
+     * @return     {<type>}  The contributed story for a point of interest.
+     */
+    getContributedStoriesForAPointOfInterest({pointOfInterestId}) {
+
+        return this._getCollection()
+            .then(collection => collection.find({
+                pointOfInterest: MongoDb.ObjectId(pointOfInterestId)
+            }).toArray());
+    }
+
+    /**
     * Inserts a contributed story
     */
     putContributedStory(contribution) {
