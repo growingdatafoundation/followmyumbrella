@@ -44,7 +44,7 @@ module.exports = class PointsOfInterestService {
                     _id: MongoDb.ObjectId(id)
                 });
 
-                let stories = [];
+                let stories;
                 if (extended) {
                     stories = this.contributedStories.getContributedStoriesForAPointOfInterest({
                         pointOfInterestId: id
