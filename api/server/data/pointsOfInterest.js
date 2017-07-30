@@ -55,9 +55,6 @@ module.exports = class PointsOfInterestService {
                     challenges = this.challengesService.getChallengesForAPointOfInterest({
                         pointOfInterestId: id
                     });
-                    challenges = this.challenges.getContributedStoriesForAPointOfInterest({
-                        pointOfInterestId: id
-                    });
                 }
 
                 return Promise.all([pointOfInterest, challenges, stories])
