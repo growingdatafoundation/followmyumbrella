@@ -30,14 +30,12 @@ module.exports = class ChallengeService {
   /**
    * Returns a single challenge with the supplied id
    */
-  getChallenge(id) {
+  getChallenge({id, extended}) {
 
     return this._getCollection()
-        .then(collection => {
-            collection.findOne({
-              _id: ObjectId(id)
-            });
-        })
+        .then(collection => collection.findOne({
+              _id: MongoDb.ObjectId(id)
+          }));
   }
 
   /**
@@ -46,21 +44,18 @@ module.exports = class ChallengeService {
   putChallenge(challenge) {
 
     return this._getCollection()
-        .then(collection => {
-            collection.insertOne(challenge);
-        });
+        .then(collection => collection.insertOne(challenge)
+        );
   }
 
   /**
    * Removes a single challenge with the supplied id
    */
-  deleteChallenge(id) {
+  deleteChallenge({id, extended}) {
     return this._getCollection()
-        .then(collection => {
-            collection.deleteOne({
-              _id: ObjectId(id)
-            });
-        });
+        .then(collection => collection.deleteOne({
+            _id: MongoDb.ObjectId(id)
+        }));
   }
 
 }

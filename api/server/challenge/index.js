@@ -26,18 +26,38 @@ exports.register = function(server, options, next) {
     server.route({
         method: 'GET',
         path: '/{id}',
+        config: {
+            validate: {
+                params: Joi.object().keys({
+                    id: Joi.string().required()
+                })
+            }
+        },
         handler: function(request, reply) {
 
-            reply(challengeService.getChallenge(request.params.id));
+            reply(challengeService.getChallenge({
+                id: request.params.id,
+                extended: true
+            }));
         }
     });
 
     server.route({
         method: 'DELETE',
         path: '/{id}',
+        config: {
+            validate: {
+                params: Joi.object().keys({
+                    id: Joi.string().required()
+                })
+            }
+        },
         handler: function(request, reply) {
 
-            reply(challengeService.deleteChallenge(request.params.id));
+            reply(challengeService.deleteChallenge({
+                id: request.params.id,
+                extended: true
+            }));
         }
     });
 
