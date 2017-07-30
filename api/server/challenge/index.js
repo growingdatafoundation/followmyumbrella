@@ -2,6 +2,7 @@
 
 const ChallengeService = require('../data/challenges')
 const Joi = require('joi');
+const Boom = require('boom');
 
 
 const optionsSchema = Joi.object().keys({
@@ -35,10 +36,19 @@ exports.register = function(server, options, next) {
         },
         handler: function(request, reply) {
 
-            reply(challengeService.getChallenge({
-                id: request.params.id,
-                extended: true
-            }));
+            challengeService.getChallenge({
+                    id: request.params.id,
+                    extended: true
+                })
+                .then(story => {
+
+                    if (!story) {
+                        return reply(Boom.notFound())
+                    }
+
+                    return reply(story);
+                })
+                .catch(reply)
         }
     });
 
