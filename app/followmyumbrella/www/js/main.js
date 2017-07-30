@@ -110,9 +110,9 @@ function open_detail(id){
 
         var clst = "";
         for(var i=0;i<stories.length;i++){
-            storylist[stories[i].id] = stories[i].body;
-            storytitlelist[stories[i].id] = stories[i].title;
-            clst += '<li><a href="javascript: story_detail(\''+stories[i].id+'\');">';
+            storylist[stories[i]._id] = stories[i].body;
+            storytitlelist[stories[i]._id] = stories[i].title;
+            clst += '<li><a href="javascript: story_detail(\''+stories[i]._id+'\');">';
             clst += '<b>'+stories[i].title+'</b>';
             clst += '<br/><i style="font-size: 10px;">By '+stories[i].author+'</i>';
             clst += '</a></li>';
