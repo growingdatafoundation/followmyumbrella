@@ -146,7 +146,7 @@ function submit_new_story(){
     $.ajax({
         url: storyapi,
         type: 'PUT',
-        data: postdata,
+        data: JSON.stringify(postdata),
         contentType: "application/json",
         success: function(data) {
             console.log(data);
