@@ -31,21 +31,12 @@ exports.register = function(server, options, next) {
             validate: {
                 params: Joi.object().keys({
                     id: Joi.string().required()
-                }),
-                query: Joi.object().keys({
-                    extended: Joi.boolean().default(true)
                 })
             }
         },
         handler: function(request, reply) {
 
-            let options = {};
-            options = Object.Assign(options, request.params);
-            options = Object.Assign(options, request.query);
-
-            return reply(options);
-
-            // reply(csService.getContributedStory(options));
+            reply(csService.getContributedStory(request.params));
         }
     });
 
