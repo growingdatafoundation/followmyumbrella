@@ -185,10 +185,11 @@ function getLocationByText(address) {
 }
 
 function search_poi_process(keyword, lat,lon){
-    console.log("test: "+keyword +" - " +lat+" - " +lon);
+    
     $.mobile.loading("show");
-    var searchurl = datafile;
-    $.getJSON( datafile, function( data ) {
+    var searchurl = datafile+"/searchtags?tags="+keyword;
+    console.log("test: "+keyword +" - " +lat+" - " +lon);
+    $.getJSON( searchurl, function( data ) {
         $.mobile.loading("hide");
         console.log(data);
         jsondata = data;

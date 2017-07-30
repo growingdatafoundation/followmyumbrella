@@ -12,7 +12,18 @@ module.exports = class PointsOfInterestService {
         assert(mongodbUrl !== undefined, 'mongodbUrl is a required argument');
         this.mongodb = new MongoDb(mongodbUrl);
         this.collectionName = 'pointOfInterests';
-        this.contributedStories = new ContributedStories(mongodbUrl);
+        this.contributedStoriesService = new ContributedStories(mongodbUrl);
+        this.challengesService = {
+            getChallengesForAPointOfInterest({ pointOfInterestId }) {
+
+                console.log("I am here!!!", pointOfInterestId)
+
+                return Promise.resolve([{
+                    _id: 'mock',
+                    pointOfInterestId
+                }]);
+            }
+        }
     }
 
     _getCollection() {
@@ -40,25 +51,33 @@ module.exports = class PointsOfInterestService {
         return this._getCollection()
             .then(collection => {
 
-                const poi = collection.findOne({
+                const pointOfInterest = collection.findOne({
                     _id: MongoDb.ObjectId(id)
                 });
 
                 let stories;
+                let challenges;
                 if (extended) {
-                    stories = this.contributedStories.getContributedStoriesForAPointOfInterest({
+                    stories = this.contributedStoriesService.getContributedStoriesForAPointOfInterest({
+                        pointOfInterestId: id
+                    });
+                    challenges = this.challengesService.getChallengesForAPointOfInterest({
                         pointOfInterestId: id
                     });
                 }
 
-                return Promise.all([poi, stories])
+                return Promise.all([pointOfInterest, challenges, stories])
             })
-            .then(([pointOfInterest, stories]) => {
+            .then(([pointOfInterest, challenges, stories]) => {
 
-                pointOfInterest.stories = stories;
-                return pointOfInterest;
+                if (!pointOfInterest) {
+                    return pointOfInterest;
+                }
 
-                return [pointOfInterest, stories];
+                return Object.assign(pointOfInterest, {
+                    stories,
+                    challenges
+                });
             })
     }
 
