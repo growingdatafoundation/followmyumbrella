@@ -1,10 +1,6 @@
 'use strict';
 
-const PointsOfInterestService = require('../data/pointsOfInterest')
 const ContributedStoriesService = require('../data/contributedStories')
-const {
-    MongoClient
-} = require('mongodb');
 const Joi = require('joi');
 
 
@@ -16,7 +12,7 @@ exports.register = function(server, options, next) {
 
     Joi.assert(options, optionsSchema);
 
-    let csService;
+    const csService = new ContributedStoriesService(options.mongoDbUrl);
 
     // Contributed stories routes
     server.route({
@@ -33,7 +29,7 @@ exports.register = function(server, options, next) {
         path: '/{id}',
         handler: function(request, reply) {
 
-            reply(csService.getContributedStory(request.params.id));
+            reply(csService.getContributedStory(request.params));
         }
     });
 
@@ -42,7 +38,7 @@ exports.register = function(server, options, next) {
         path: '/{id}',
         handler: function(request, reply) {
 
-            reply(csService.deleteContributedStory(request.params.id));
+            reply(csService.deleteContributedStory(request.params));
         }
     });
 
@@ -64,13 +60,7 @@ exports.register = function(server, options, next) {
         }
     });
 
-    MongoClient.connect(options.mongoDbUrl)
-        .then((db) => db.collection('contributedStories'))
-        .then((contributedStoriesCollections) => {
-            csService = new ContributedStoriesService(contributedStoriesCollections)
-
-            return next();
-        });
+    return next();
 };
 
 exports.register.attributes = {

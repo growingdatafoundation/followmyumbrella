@@ -1,17 +1,23 @@
 'use strict';
 
 const assert = require('assert');
-const {
-  ObjectId
-} = require('mongodb');
+const MongoDb = require('./mongoDb');
+const ContributedStories = require('./contributedStories');
 
 
 module.exports = class PointsOfInterestService {
 
-    constructor(collection) {
+    constructor(mongodbUrl) {
 
-        assert(collection !== undefined, 'Collection is a required argument');
-        this.collection = collection;
+        assert(mongodbUrl !== undefined, 'mongodbUrl is a required argument');
+        this.mongodb = new MongoDb(mongodbUrl);
+        this.collectionName = 'pointOfInterests';
+        this.contributedStories = new ContributedStories(mongodbUrl);
+    }
+
+    _getCollection() {
+
+        return this.mongodb.getCollection(this.collectionName);
     }
 
     /**
@@ -19,48 +25,74 @@ module.exports = class PointsOfInterestService {
      */
     getPointsOfInterest() {
 
-        return this.collection.find().toArray();
+        return this._getCollection()
+            .then(collection => collection.find().toArray());
     }
 
     /**
      * Returns a single point of interest
      */
-    getPointOfInterest(id) {
+    getPointOfInterest({id, extended = true}) {
 
-        return this.collection.findOne({
-            _id: ObjectId(id)
-        });
+        assert(id, 'id is a required argument');
+        console.log('id', id);
+
+        return this._getCollection()
+            .then(collection => {
+
+                const poi = collection.findOne({
+                    _id: MongoDb.ObjectId(id)
+                });
+
+                let stories = [];
+                if (extended) {
+                    stories = this.contributedStories.getContributedStoriesForAPointOfInterest({
+                        pointOfInterestId: id
+                    });
+                }
+
+                return Promise.all([poi, stories])
+            })
+            .then(([pointOfInterest, stories]) => {
+
+                pointOfInterest.stories = stories;
+                return pointOfInterest;
+
+                return [pointOfInterest, stories];
+            })
     }
 
     /**
     * Returns points of interest near the location within the supplied radius
     */
-    getNearbyPointsOfInterest(long, lat, radius) {
+    getNearbyPointsOfInterest({ long, lat, radius }) {
 
-        return this.collection.find({
-            location: {
-                $nearSphere: {
-                    $geometry: {
-                        type: "Point",
-                        coordinates: [long, lat]
-                    },
-                    $minDistance: 1,
-                    $maxDistance: radius
+        return this._getCollection()
+            .then(collection => collection.find({
+                location: {
+                    $nearSphere: {
+                        $geometry: {
+                            type: "Point",
+                            coordinates: [long, lat]
+                        },
+                        $minDistance: 1,
+                        $maxDistance: radius
+                    }
                 }
-            }
-        }).toArray();
+            }).toArray());
     }
 
     /**
     * Returns points of interest which have tags matching at least one of the
     * querystring parameters
     */
-    getMatchingPointsOfInterest(tags) {
+    getMatchingPointsOfInterest({ tags }) {
 
-        return this.collection.find({
-            tags: {
-                $in: tags
-            }
-        }).toArray();
+        return this._getCollection()
+            .then(collection => collection.find({
+                tags: {
+                    $in: tags
+                }
+            }).toArray());
     }
 }
