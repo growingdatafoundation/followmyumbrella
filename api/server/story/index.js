@@ -73,5 +73,5 @@ exports.register = function(server, options, next) {
 };
 
 exports.register.attributes = {
-    name: 'follow-my-umbrella-stories'
+    name: 'follow-my-umbrella-story'
 };
