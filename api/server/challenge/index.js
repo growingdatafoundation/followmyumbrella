@@ -1,9 +1,6 @@
 'use strict';
 
 const ChallengeService = require('../data/challenges')
-const {
-    MongoClient
-} = require('mongodb');
 const Joi = require('joi');
 
 
@@ -17,7 +14,6 @@ exports.register = function(server, options, next) {
 
     let challengeService;
 
-    // Challenge routes
     server.route({
         method: 'GET',
         path: '/',
@@ -66,13 +62,9 @@ exports.register = function(server, options, next) {
         }
     });
 
-    MongoClient.connect(options.mongoDbUrl)
-        .then((db) => db.collection('challenges'))
-        .then((challengeCollection) => {
-            challengeService = new ChallengeService(challengeCollection)
+    challengeService = new ChallengeService(options.mongoDbUrl);
 
-            return next();
-        });
+    return next();
 };
 
 exports.register.attributes = {

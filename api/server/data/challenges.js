@@ -1,18 +1,21 @@
 'use strict';
 
 const assert = require('assert');
-const {
-  ObjectId
-} = require('mongodb');
+const MongoDb = require('./mongoDb');;
 
 
 module.exports = class ChallengeService {
 
-  constructor(collection) {
+  constructor(mongodbUrl) {
 
-    assert(collection !== undefined, 'Collection is a required argument');
-    this.collection = collection;
+      assert(mongodbUrl !== undefined, 'mongodbUrl is a required argument');
+      this.mongodb = new MongoDb(mongodbUrl);
+      this.collectionName = 'challenges';
+  }
 
+  _getCollection() {
+
+      return this.mongodb.getCollection(this.collectionName);
   }
 
   /**
@@ -20,7 +23,8 @@ module.exports = class ChallengeService {
    */
   getChallenges() {
 
-    return this.collection.find().toArray();
+    return this._getCollection()
+        .then(collection => collection.find().toArray());
   }
 
   /**
@@ -28,9 +32,12 @@ module.exports = class ChallengeService {
    */
   getChallenge(id) {
 
-    return this.collection.findOne({
-      _id: ObjectId(id)
-    });
+    return this._getCollection()
+        .then(collection => {
+            collection.findOne({
+              _id: ObjectId(id)
+            });
+        })
   }
 
   /**
@@ -38,17 +45,22 @@ module.exports = class ChallengeService {
    */
   putChallenge(challenge) {
 
-    this.collection.insertOne(challenge)
+    return this._getCollection()
+        .then(collection => {
+            collection.insertOne(challenge);
+        });
   }
 
   /**
    * Removes a single challenge with the supplied id
    */
   deleteChallenge(id) {
-
-    return this.collection.deleteOne({
-      _id: ObjectId(id)
-    });
+    return this._getCollection()
+        .then(collection => {
+            collection.deleteOne({
+              _id: ObjectId(id)
+            });
+        });
   }
 
 }
