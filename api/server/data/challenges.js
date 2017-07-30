@@ -1,7 +1,8 @@
 'use strict';
 
 const assert = require('assert');
-const MongoDb = require('./mongoDb');;
+const MongoDb = require('./mongoDb');
+
 
 
 module.exports = class ChallengeService {
@@ -30,12 +31,27 @@ module.exports = class ChallengeService {
   /**
    * Returns a single challenge with the supplied id
    */
-  getChallenge({id, extended}) {
+  getChallenge({id}) {
 
     return this._getCollection()
         .then(collection => collection.findOne({
-              _id: MongoDb.ObjectId(id)
-          }));
+            _id: MongoDb.ObjectId(id)
+        }));
+  }
+
+  /**
+   * Gets the contributed stories for a point of interest.
+   *
+   * @param      {Object}  arg1                    The argument 1
+   * @param      {<type>}  arg1.pointOfInterestId  The point of interest identifier
+   * @return     {<type>}  The contributed challenge for a point of interest.
+   */
+  getChallengesForAPointOfInterest({pointOfInterestId}) {
+
+      return this._getCollection()
+          .then(collection => collection.find({
+              pointOfInterest: MongoDb.ObjectId(pointOfInterestId)
+          }).toArray());
   }
 
   /**
