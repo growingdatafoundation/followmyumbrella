@@ -23,9 +23,11 @@
 */
 //var datafile = "js/sampledata.json";
 var datafile = "http://app.followmyumbrella.com/api/v1/point-of-interest";
+var storyapi = "http://app.followmyumbrella.com/api/v1/story";
 var jsondata;
 var storylist = new Object;
 var storytitlelist = new Object;
+var map;
 $( document ).ready(function(){
     $("#near_me").change(function() {
         if($(this).is(":checked")) {
@@ -103,15 +105,16 @@ function open_detail(id){
         storyObj.author="Guest";
         storyObj.date="30-07-2017";
 
-        story = [storyObj];
+        //story = [storyObj];
+        stories = detaildata.stories;
 
         var clst = "";
-        for(var i=0;i<story.length;i++){
-            storylist[storyObj.id] = storyObj.story;
-            storytitlelist[storyObj.id] = storyObj.name;
-            clst += '<li><a href="javascript: story_detail(\''+storyObj.id+'\');">';
-            clst += '<b>'+story[i].name+'</b>';
-            clst += '<br/><i style="font-size: 10px;">By '+story[i].name+' on '+story[i].date+'</i>';
+        for(var i=0;i<stories.length;i++){
+            storylist[stories[i].id] = stories[i].body;
+            storytitlelist[stories[i].id] = stories[i].title;
+            clst += '<li><a href="javascript: story_detail(\''+stories[i].id+'\');">';
+            clst += '<b>'+stories[i].title+'</b>';
+            clst += '<br/><i style="font-size: 10px;">By '+stories[i].author+'</i>';
             clst += '</a></li>';
         }
         $("#poi-story").html(clst);
@@ -139,6 +142,17 @@ function submit_new_story(){
     }
     // TODO submit to server
     console.log($("#poi-s-form").serialize());
+    var postdata = {title: $("#poi-s-title").val(), body: $("#poi-s-story").val(), pointOfInterest: $("#poi-s-id").val(), author: "Guest" }
+    $.ajax({
+        url: storyapi,
+        type: 'PUT',
+        data: postdata,
+        contentType: "application/json",
+        success: function(data) {
+            console.log(data);
+            open_detail($("#poi-s-id").val());
+        }
+    });
     open_detail($("#poi-s-id").val());
 
 }
