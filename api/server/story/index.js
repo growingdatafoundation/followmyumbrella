@@ -27,9 +27,25 @@ exports.register = function(server, options, next) {
     server.route({
         method: 'GET',
         path: '/{id}',
+        config: {
+            validate: {
+                params: Joi.object().keys({
+                    id: Joi.string().required()
+                }),
+                query: Joi.object().keys({
+                    extended: Joi.boolean().default(true)
+                })
+            }
+        },
         handler: function(request, reply) {
 
-            reply(csService.getContributedStory(request.params));
+            let options = {};
+            options = Object.Assign(options, request.params);
+            options = Object.Assign(options, request.query);
+
+            return reply(options);
+
+            // reply(csService.getContributedStory(options));
         }
     });
 
