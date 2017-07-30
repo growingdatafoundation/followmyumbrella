@@ -28,7 +28,7 @@ const manifest = {
     registrations: [
         {
             plugin: {
-                register: './server/api/index',
+                register: './server/point-of-interest/',
                 options: {
                     mongoDbUrl: process.env.MONGO_DB_URL || 'mongodb://localhost:27017/historic'
                 }
@@ -37,6 +37,20 @@ const manifest = {
                 select: ['api'],
                 routes: {
                     prefix: '/api/v1/point-of-interest'
+                }
+            }
+        },
+        {
+            plugin: {
+                register: './server/story/',
+                options: {
+                    mongoDbUrl: process.env.MONGO_DB_URL || 'mongodb://localhost:27017/historic'
+                }
+            },
+            options: {
+                select: ['api'],
+                routes: {
+                    prefix: '/api/v1/story'
                 }
             }
         },

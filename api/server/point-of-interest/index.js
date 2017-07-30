@@ -50,7 +50,7 @@ exports.register = function(server, options, next) {
             }
         },
         handler: function(request, reply) {
-            reply(poiService.getPointsOfInterest(
+            reply(poiService.getNearbyPointsOfInterest(
                 request.query.long,
                 request.query.lat,
                 request.query.radius
@@ -58,22 +58,22 @@ exports.register = function(server, options, next) {
         }
     });
 
-  server.route({
-    method: 'GET',
-    path: '/searchtags',
-    config: {
-      validate: {
-        query: Joi.object().keys({
-          tags: Joi.string().default('')
-        })
-      }
-    },
-    handler: function(request, reply) {
-      reply(poiService.getMatchingPointsOfInterest(
-        request.query.tags.split(',')
-      ));
-    }
-  });
+    server.route({
+        method: 'GET',
+        path: '/searchtags',
+        config: {
+            validate: {
+            query: Joi.object().keys({
+                tags: Joi.string().default('')
+            })
+            }
+        },
+        handler: function(request, reply) {
+            reply(poiService.getMatchingPointsOfInterest(
+                request.query.tags.split(',')
+            ));
+        }
+    });
 
   // Contributed stories routes
   server.route({

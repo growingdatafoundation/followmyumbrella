@@ -33,24 +33,6 @@ module.exports = class PointsOfInterestService {
     }
 
     /**
-     * Returns points of interest near the location within the supplied radius
-     */
-    getPointsOfInterest(long, lat, radius) {
-        return this.collection.find({
-            location: {
-                $nearSphere: {
-                    $geometry: {
-                        type: "Point",
-                        coordinates: [long, lat]
-                    },
-                    $minDistance: 1,
-                    $maxDistance: radius
-                }
-            }
-        }).toArray();
-    }
-
-    /**
     * Returns points of interest near the location within the supplied radius
     */
     getNearbyPointsOfInterest(long, lat, radius) {
