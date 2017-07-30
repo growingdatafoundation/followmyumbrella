@@ -2,6 +2,7 @@
 
 const assert = require('assert');
 const MongoDb = require('./mongoDb');
+const ContributedStories = require('./contributedStories');
 
 
 module.exports = class PointsOfInterestService {
@@ -11,6 +12,7 @@ module.exports = class PointsOfInterestService {
         assert(mongodbUrl !== undefined, 'mongodbUrl is a required argument');
         this.mongodb = new MongoDb(mongodbUrl);
         this.collectionName = 'pointOfInterests';
+        this.contributedStories = new ContributedStories(mongodbUrl);
     }
 
     _getCollection() {
@@ -30,15 +32,34 @@ module.exports = class PointsOfInterestService {
     /**
      * Returns a single point of interest
      */
-    getPointOfInterest({id, extended}) {
+    getPointOfInterest({id, extended = true}) {
 
         assert(id, 'id is a required argument');
         console.log('id', id);
 
         return this._getCollection()
-            .then(collection => collection.findOne({
-                _id: MongoDb.ObjectId(id)
-            }));
+            .then(collection => {
+
+                const poi = collection.findOne({
+                    _id: MongoDb.ObjectId(id)
+                });
+
+                let stories = [];
+                if (extended) {
+                    stories = this.contributedStories.getContributedStoriesForAPointOfInterest({
+                        pointOfInterestId: id
+                    });
+                }
+
+                return Promise.all([poi, stories])
+            })
+            .then(([pointOfInterest, stories]) => {
+
+                pointOfInterest.stories = stories;
+                return pointOfInterest;
+
+                return [pointOfInterest, stories];
+            })
     }
 
     /**

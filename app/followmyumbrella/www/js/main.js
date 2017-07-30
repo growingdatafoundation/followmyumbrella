@@ -21,8 +21,11 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-var datafile = "js/sampledata.json";
+//var datafile = "js/sampledata.json";
+var datafile = "http://app.followmyumbrella.com/api/v1/point-of-interest";
 var jsondata;
+var storylist = new Object;
+var storytitlelist = new Object;
 $( document ).ready(function(){
     $("#near_me").change(function() {
         if($(this).is(":checked")) {
@@ -71,10 +74,11 @@ function open_poi_idea(){
 
 function open_detail(id){
     $.mobile.loading("show");
-    $.getJSON( datafile, function( data ) {
+
+    $.getJSON( datafile+"/"+id, function( data ) {
         $.mobile.loading("hide");
         console.log(data);
-        detaildata = data[5];
+        detaildata = data;
         if (typeof detaildata.title !== "undefined" && detaildata.title !="") {
             $("#poi-title").html(detaildata.title);
         }
@@ -87,50 +91,134 @@ function open_detail(id){
         if (typeof detaildata.url !== "undefined" && detaildata.ulr !="") {
             $("#poi-more").html('<a href="javascript: open_external(\''+detaildata.url+'\')">More information...</a>');
         }
-        $("#poi-c-id").val(detaildata._id);
-        $("#poi-c-author").val("Guest");
-        $("#poi-c-title").val("");
-        $("#poi-c-story").val("");
+        $("#poi-s-id").val(detaildata._id);
+        $("#poi-s-author").val("Guest");
+        $("#poi-s-title").val("");
+        $("#poi-s-story").val("");
 
-        var challengeObj = new Object();
-        challengeObj.id="123";
-        challengeObj.name="Challenge title";
-        challengeObj.story="Challenge story";
-        challengeObj.author="Guest";
-        challengeObj.date="30-07-2017";
+        var storyObj = new Object();
+        storyObj.id="123";
+        storyObj.name="Story title";
+        storyObj.story="Story story";
+        storyObj.author="Guest";
+        storyObj.date="30-07-2017";
 
-        challenge = [challengeObj];
+        story = [storyObj];
 
         var clst = "";
-        for(var i=0;i<challenge.length;i++){
-            clst += '<li><a href="javajscript: challenge_detail();">';
-            clst += '<b>'+challenge[i].name+'</b>';
-            clst += '<br/><i style="font-size: 10px;">By '+challenge[i].name+' on '+challenge[i].date+'</i>';
+        for(var i=0;i<story.length;i++){
+            storylist[storyObj.id] = storyObj.story;
+            storytitlelist[storyObj.id] = storyObj.name;
+            clst += '<li><a href="javascript: story_detail(\''+storyObj.id+'\');">';
+            clst += '<b>'+story[i].name+'</b>';
+            clst += '<br/><i style="font-size: 10px;">By '+story[i].name+' on '+story[i].date+'</i>';
             clst += '</a></li>';
         }
-        $("#poi-challenge").html(clst);
-        $("#poi-challenge").listview( "refresh" );
+        $("#poi-story").html(clst);
+        $("#poi-story").listview( "refresh" );
 
     });
+    console.log(storylist);
     $( ":mobile-pagecontainer" ).pagecontainer( "change", "#poi-detail-page", { role: "page" } );
     
 
 }
 
+function story_detail(id){
+    $("#popup-title").html(storytitlelist[id]);
+    $("#popup-content").html(storylist[id]);
+    $("#popupDialog").popup("open");
+}
 
 
-function submit_new_challenge(){
-    if($("#poi-c-id").val()=="" || $("#poi-c-title").val()=="" || $("#poi-c-story").val()=="" ){
+
+function submit_new_story(){
+    if($("#poi-s-id").val()=="" || $("#poi-s-title").val()=="" || $("#poi-s-story").val()=="" ){
         show_alert("Please fill in both title and story before submit new challenge");
         return;
     }
     // TODO submit to server
-    console.log($("#poi-c-form").serialize());
-    open_detail($("#poi-c-id").val());
+    console.log($("#poi-s-form").serialize());
+    open_detail($("#poi-s-id").val());
 
 }
 function search_poi(){
+    $.mobile.loading("show");
+    if($("#near_me").is(":checked")) {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(getPosition);
+        } else {
+            show_alert("Can not get location information");
+            search_poi_process($("#keyword").val(),0,0);
+        }
+    } else if ($("#location").val()!=""){
+        getLocationByText($("#location").val());
+    } else {
+        search_poi_process($("#keyword").val(),0,0);
+    }
 
+}
+
+
+
+function getPosition(position) {
+    console.log(position);
+    search_poi_process($("#keyword").val(),position.coords.latitude ,position.coords.longitude);
+}
+
+function getLocationByText(address) {
+    var osm="https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=1";
+    $.post(osm+"&q="+encodeURI(address), {}, function (data) {
+		$.mobile.loading("hide");
+		
+		if(data.length>0){
+			mylocation=[parseFloat(data[0].lon),parseFloat(data[0].lat)];
+			console.log(mylocation);
+            search_poi_process($("#keyword").val(),parseFloat(data[0].lat),parseFloat(data[0].lon));
+		}
+    }, 'json').fail(function () {
+        show_alert('Connection error');
+        $.mobile.loading("hide");
+
+    });
+
+}
+
+function search_poi_process(keyword, lat,lon){
+    console.log("test: "+keyword +" - " +lat+" - " +lon);
+    $.mobile.loading("show");
+    var searchurl = datafile;
+    $.getJSON( datafile, function( data ) {
+        $.mobile.loading("hide");
+        console.log(data);
+        jsondata = data;
+        var str="";
+		for(var i=0;i<data.length;i++){
+             var poiimg='img/noimage.png';
+			
+			 if (typeof data[i].image !== "undefined" && data[i].image !="") {
+				poiimg='data:image/png;base64,'+data[i].image+'';
+			 }
+             var poititle='';
+			 if (typeof data[i].title !== "undefined" && data[i].title !="") {
+				poititle=data[i].title;
+			 }
+             var poidescription='';
+			 if (typeof data[i].description !== "undefined" && data[i].description !="") {
+				poidescription=data[i].description;
+			 }
+             str += '<li>';
+             str += '<a href="javascript: open_detail(\''+data[i]._id+'\')">';
+             str += '<img src="'+poiimg+'" class="ui-thumbnail ui-thumbnail-circular" />';
+             str += '<h2>'+poititle+'</h2>';
+             str += '<p>'+poidescription+'</p>';
+             str += '</a>';
+             str += '</li>';
+        }
+        $("#poi-search-list").html(str);
+        $( ":mobile-pagecontainer" ).pagecontainer( "change", "#poi-search-result-page", { role: "page" } );
+		$("#poi-search-list").listview( "refresh" );
+    });
 }
 
 function open_external(url){
