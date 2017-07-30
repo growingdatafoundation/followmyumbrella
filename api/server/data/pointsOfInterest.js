@@ -3,6 +3,7 @@
 const assert = require('assert');
 const MongoDb = require('./mongoDb');
 const ContributedStories = require('./contributedStories');
+const Challenges = require('./challenges')
 
 
 module.exports = class PointsOfInterestService {
@@ -13,17 +14,7 @@ module.exports = class PointsOfInterestService {
         this.mongodb = new MongoDb(mongodbUrl);
         this.collectionName = 'pointOfInterests';
         this.contributedStoriesService = new ContributedStories(mongodbUrl);
-        this.challengesService = {
-            getChallengesForAPointOfInterest({ pointOfInterestId }) {
-
-                console.log("I am here!!!", pointOfInterestId)
-
-                return Promise.resolve([{
-                    _id: 'mock',
-                    pointOfInterestId
-                }]);
-            }
-        }
+        this.challengesService = new Challenges(mongodbUrl);
     }
 
     _getCollection() {

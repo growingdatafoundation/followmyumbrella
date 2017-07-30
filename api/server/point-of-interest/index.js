@@ -2,6 +2,7 @@
 
 const PointsOfInterestService = require('../data/pointsOfInterest')
 const Joi = require('joi');
+const Boom = require('boom');
 
 
 const optionsSchema = Joi.object().keys({
@@ -41,7 +42,16 @@ exports.register = function(server, options, next) {
             let options = Object.assign({}, request.params);
             options = Object.assign(options, request.query);
 
-            return reply(poiService.getPointOfInterest(options));
+            poiService.getPointOfInterest(options)
+                .then(pointOfInterest => {
+
+                    if (!pointOfInterest) {
+                        return reply(Boom.notFound())
+                    }
+
+                    return reply(pointOfInterest);
+                })
+                .catch(reply)
         }
     });
 

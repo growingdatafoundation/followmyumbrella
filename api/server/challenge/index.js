@@ -1,6 +1,6 @@
 'use strict';
 
-const ContributedStoriesService = require('../data/contributedStories')
+const ChallengeService = require('../data/challenges')
 const Joi = require('joi');
 const Boom = require('boom');
 
@@ -13,15 +13,14 @@ exports.register = function(server, options, next) {
 
     Joi.assert(options, optionsSchema);
 
-    const csService = new ContributedStoriesService(options.mongoDbUrl);
+    let challengeService;
 
-    // Contributed stories routes
     server.route({
         method: 'GET',
         path: '/',
         handler: function(request, reply) {
 
-            reply(csService.getContributedStories());
+            reply(challengeService.getChallenges());
         }
     });
 
@@ -37,7 +36,10 @@ exports.register = function(server, options, next) {
         },
         handler: function(request, reply) {
 
-            csService.getContributedStory(request.params)
+            challengeService.getChallenge({
+                    id: request.params.id,
+                    extended: true
+                })
                 .then(story => {
 
                     if (!story) {
@@ -53,9 +55,19 @@ exports.register = function(server, options, next) {
     server.route({
         method: 'DELETE',
         path: '/{id}',
+        config: {
+            validate: {
+                params: Joi.object().keys({
+                    id: Joi.string().required()
+                })
+            }
+        },
         handler: function(request, reply) {
 
-            reply(csService.deleteContributedStory(request.params));
+            reply(challengeService.deleteChallenge({
+                id: request.params.id,
+                extended: true
+            }));
         }
     });
 
@@ -66,20 +78,25 @@ exports.register = function(server, options, next) {
             validate: {
                 payload: Joi.object().keys({
                 title: Joi.string().required(),
-                body: Joi.string().required(),
+                qAndAPairs: Joi.array().items({
+                    question: Joi.string().required(),
+                    answer: Joi.string().default('')
+                }).required(),
                 pointOfInterest: Joi.string().required(),
                 author: Joi.string().default('guest@followmyumbrella.com'),
             })
           }
         },
         handler: function(request, reply) {
-          reply(csService.putContributedStory(request.payload));
+          reply(challengeService.putChallenge(request.payload));
         }
     });
+
+    challengeService = new ChallengeService(options.mongoDbUrl);
 
     return next();
 };
 
 exports.register.attributes = {
-    name: 'follow-my-umbrella-story'
+    name: 'follow-my-umbrella-challenge'
 };
