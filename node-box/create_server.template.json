@@ -1,0 +1,25 @@
+{
+    "TemplateBody": "file:////cf//create_server.yaml",
+    "Parameters": [
+        {
+            "ParameterKey": "InstanceType",
+            "ParameterValue": "t2.micro"
+        },
+        {
+            "ParameterKey": "KeyName",
+            "ParameterValue": "bs-aws-sydney"
+        },
+        {
+            "ParameterKey": "MongoDbAdminUser",
+            "ParameterValue": "mongo"
+        },
+        {
+            "ParameterKey": "MongoDbAdminPassword",
+            "ParameterValue": "????"
+        },
+        {
+            "ParameterKey": "NodeUserAuthorisedKey",
+            "ParameterValue": "????"
+        }
+    ]
+}
